@@ -14,13 +14,28 @@ class TestUser(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.user.user_id = -1
 
-    def test_user_getters_setters_name(self):
+    def test_user_getters_setters_name_in_range(self):
         self.user.name = "DAVID"
         self.assertEqual(self.user.name, "david")
+
+    def test_user_getters_setters_name_out_range(self):
+        with self.assertRaises(ValueError):
+            self.user.name = ""
 
     def test_user_getters_setters_email(self):
         self.user.email = "AnewEmail@email.com"
         self.assertEqual(self.user.email, "anewemail@email.com")
+
+    def test_user_getters_setters_email_out_range(self):
+        with self.assertRaises(ValueError):
+            self.user.email = ""
+
+    def test_user_getters_setters_password_in_range(self):
+        self.assertEqual(self.user.password, User.password_hasher("TestPassword"))
+
+    def test_user_getters_setters_password_out_range(self):
+        with self.assertRaises(ValueError):
+            self.user.password = ""
 
     def test_user_password_change_to_new(self):
         self.assertTrue(self.user.change_password("NewPassword","TestPassword"))
