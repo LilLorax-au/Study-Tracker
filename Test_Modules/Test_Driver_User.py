@@ -2,8 +2,9 @@ import unittest
 from Study_Tracker_Modules.User import User
 
 class TestUser(unittest.TestCase):
+
     def setUp(self):
-        self.user = User(1, "Isaac","isaac.brown154@outlook.com","TestPassword")
+        self.user = User(1, "Isaac","isaac.brown154@outlook.com",User.password_hasher("TestPassword"))
 
     def test_user_getters_setters_id_in_range(self):
         self.user.user_id = 1

@@ -1,10 +1,17 @@
+import hashlib
 from logging import raiseExceptions
 
 
 class User:
-    def __init__(self, user_id, name: str, email: str, password: str):
+    def __init__(self, user_id: int, name: str, email: str, password: str):
         if user_id < 0:
-            raise ValueError
+            raise ValueError("User id cannot be negative")
+        elif not name:
+            raise ValueError("Name cannot be empty")
+        elif not email:
+            raise ValueError("Email cannot be empty")
+        elif not password:
+            raise ValueError("Password cannot be empty")
         else:
             self.__user_id: int = user_id
             self.__name: str = name
@@ -21,7 +28,6 @@ class User:
             raise ValueError
         else:
             self.__user_id = value
-
 
     @property
     def name(self):
@@ -48,8 +54,16 @@ class User:
         self.__password = value
 
     def change_password(self, new_password, old_password) -> bool:
+        new_password = self.password_hasher(new_password)
+        old_password = self.password_hasher(old_password)
         if old_password != new_password and old_password == self.password:
              self.password = new_password
              return True
         else:
             return False
+
+    @staticmethod
+    def password_hasher(password: str) -> str:
+        password = hashlib.sha256(password.encode()).hexdigest()
+        return password
+
