@@ -1,12 +1,12 @@
 import time
 import unittest
-from Study_Tracker_Modules import Stopwatch
+from Study_Tracker_Modules.Stopwatch import Stopwatch
 
 
 class StopwatchTest(unittest.TestCase):
 
     def setUp(self):
-        self.stopwatch = Stopwatch.Stopwatch()
+        self.stopwatch = Stopwatch()
         self.stopwatch.start_time()
         time.sleep(1)
         self.result = self.stopwatch.stop_time()
