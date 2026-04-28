@@ -3,7 +3,15 @@ from Study_Tracker_Modules.User import User
 
 class Test_Driver_User(unittest.TestCase):
     def setUp(self):
-        self.user = User("Isaac","isaac.brown154@outlook.com","TestPassword")
+        self.user = User(1, "Isaac","isaac.brown154@outlook.com","TestPassword")
+
+    def test_user_getters_setters_id_in_range(self):
+        self.user.user_id = 1
+        self.assertEqual(self.user.user_id, 1)
+
+    def test_user_getters_setters_id_out_lower_range(self):
+        with self.assertRaises(ValueError):
+            self.user.user_id = -1
 
     def test_user_getters_setters_name(self):
         self.user.name = "DAVID"
