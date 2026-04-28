@@ -20,5 +20,9 @@ class StopwatchTest(unittest.TestCase):
     def test_timer_out_of_range_lower(self):
         self.assertFalse(self.result < 1)
 
+    def test_timer_stop_before_start(self):
+        with self.assertRaises(Exception):
+            self.stopwatch.stop_time()
+
 if __name__ == '__main__':
     unittest.main()

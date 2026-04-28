@@ -1,6 +1,4 @@
-import email
 import hashlib
-from logging import raiseExceptions
 
 
 class User:
@@ -20,51 +18,51 @@ class User:
             self.__password: str = password
 
     @property
-    def user_id(self):
+    def user_id(self) -> int:
         return self.__user_id
 
     @user_id.setter
-    def user_id(self, value):
+    def user_id(self, value: int) -> None:
         if value < 0:
             raise ValueError
         else:
             self.__user_id = value
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         if not value:
             raise ValueError("Name cannot be empty")
         else:
             self.__name = value.lower()
 
     @property
-    def email(self):
+    def email(self) -> str:
         return self.__email
 
     @email.setter
-    def email(self, value):
+    def email(self, value: str) -> None:
         if not value:
             raise ValueError("Email cannot be empty")
         else:
             self.__email = value.lower()
 
     @property
-    def password(self):
+    def password(self) -> str:
         return self.__password
 
     @password.setter
-    def password(self, value):
+    def password(self, value: str) -> None:
         if not value:
             raise ValueError("Password cannot be empty")
         else:
             self.__password = value
 
 
-    def change_password(self, new_password, old_password) -> bool:
+    def change_password(self, new_password: str, old_password: str) -> bool:
         new_password = self.password_hasher(new_password)
         old_password = self.password_hasher(old_password)
         if old_password != new_password and old_password == self.password:
