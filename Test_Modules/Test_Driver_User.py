@@ -1,7 +1,7 @@
 import unittest
 from Study_Tracker_Modules.User import User
 
-class Test_Driver_User(unittest.TestCase):
+class TestUser(unittest.TestCase):
     def setUp(self):
         self.user = User(1, "Isaac","isaac.brown154@outlook.com","TestPassword")
 
