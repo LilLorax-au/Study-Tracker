@@ -3,26 +3,26 @@
 
 
 class Subject:
-    def __init__(self, subject_id: int, name: str, description: str, weekly_recommended_hours: int, difficulty: int):
+    def __init__(self, subject_id: int, name: str, description: str, weekly_goal_hours: int, difficulty: int):
         if subject_id < 0:
             raise ValueError("Subject id cannot be negative")
         elif not name:
             raise ValueError("Subject name cannot be empty")
         elif not description:
             raise ValueError("Subject description cannot be empty")
-        elif weekly_recommended_hours < 0:
-            raise ValueError("Weekly recommended hours cannot be negative")
-        elif weekly_recommended_hours > (24*7):
-            raise ValueError("Weekly recommended hours cannot be greater than a week")
+        elif weekly_goal_hours < 0:
+            raise ValueError("Subject Weekly goal hours cannot be negative")
+        elif weekly_goal_hours > (24 * 7):
+            raise ValueError("Subject Weekly goal hours cannot be greater than a week")
         elif difficulty < 0:
-            raise ValueError("Difficulty cannot be negative")
+            raise ValueError("Subject Difficulty cannot be negative")
         elif difficulty > 10:
-            raise ValueError("Difficulty cannot be greater than 10")
+            raise ValueError("Subject Difficulty cannot be greater than 10")
         else:
             self.__subject_id: int = subject_id
             self.__name: str = name
             self.__description: str = description
-            self.__weekly_recommended_hours: int = weekly_recommended_hours
+            self.__weekly_goal_hours: int = weekly_goal_hours
             self.__difficulty: int = difficulty
 
     @property
@@ -60,16 +60,16 @@ class Subject:
 
     @property
     def weekly_recommended_hours(self) -> int:
-        return self.__weekly_recommended_hours
+        return self.__weekly_goal_hours
 
     @weekly_recommended_hours.setter
-    def weekly_recommended_hours(self, weekly_recommended_hours: int) -> None:
-        if weekly_recommended_hours < 0:
+    def weekly_recommended_hours(self, weekly_goal_hours: int) -> None:
+        if weekly_goal_hours < 0:
             raise ValueError("Weekly recommended hours cannot be negative")
-        elif weekly_recommended_hours > (24*7):
+        elif weekly_goal_hours > (24 * 7):
             raise ValueError("Weekly recommended hours cannot be greater than a week")
         else:
-            self.__weekly_recommended_hours = weekly_recommended_hours
+            self.__weekly_goal_hours = weekly_goal_hours
 
     @property
     def difficulty(self) -> int:

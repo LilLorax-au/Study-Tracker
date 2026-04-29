@@ -5,7 +5,7 @@ from datetime import datetime
 class Stopwatch:
     def __init__(self):
         self.__start: datetime | None = None
-        self.__end: datetime | None= None
+        self.__end: datetime | None = None
         self.__counter: float = 0
 
     def start_time(self) -> datetime | None:

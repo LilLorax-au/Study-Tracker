@@ -6,8 +6,9 @@ class Session:
     def __init__(self, session_id: int, date: datetime, session_time: float, study_type: str, subject_id: int, user_id: int):
         if session_id < 0:
             raise Exception('Session id cannot be negative')
-        elif date != type(datetime):
-            raise Exception('Date must be of type datetime')
+        # TODO fix this, needs to be date
+        # elif date != type(datetime):
+        #     raise Exception('Date must be of type datetime')
         elif session_time < 0:
             raise Exception('Session time cannot be negative')
         elif study_type.lower() not in STUDY_TYPES:
@@ -18,7 +19,7 @@ class Session:
             raise Exception('User id cannot be negative')
         else:
             self.__session_id = session_id
-            self.__date = date
+            self.__date = date.date()
             self.__session_time = session_time
             self.__study_type = study_type
             self.__subject_id = subject_id
@@ -35,8 +36,9 @@ class Session:
         else:
             self.__session_id = value
 
+    # TODO need to assign date properly
     @property
-    def date(self) -> datetime:
+    def date(self):
         return self.__date
 
     @date.setter
