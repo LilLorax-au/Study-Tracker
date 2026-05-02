@@ -20,8 +20,8 @@ class Subject:
             raise ValueError("Subject Difficulty cannot be greater than 10")
         else:
             self.__subject_id: int = subject_id
-            self.__name: str = name
-            self.__description: str = description
+            self.__name: str = name.lower()
+            self.__description: str = description.lower()
             self.__weekly_goal_hours: int = weekly_goal_hours
             self.__difficulty: int = difficulty
 

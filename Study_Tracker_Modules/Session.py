@@ -21,7 +21,7 @@ class Session:
             self.__session_id = session_id
             self.__date = date.date()
             self.__session_time = session_time
-            self.__study_type = study_type
+            self.__study_type = study_type.lower()
             self.__subject_id = subject_id
             self.__user_id = user_id
 

@@ -128,6 +128,7 @@ def main_loop(data):
                 continue
             case "new subject":
 
+                continue
             case "user":
                 continue
 
@@ -135,7 +136,7 @@ def main_loop(data):
 def session_manager(data):
     exit_now = False
     session_type = ""
-    subject = ""
+    subject_name = ""
     subject_id = 0
     start = ""
 
@@ -149,11 +150,12 @@ def session_manager(data):
                     session_type = ""
                     raise ValueError("Please enter a valid session type")
 
-            if not subject:
-                subject = input("Please enter your session's subject: ")
-                subject_id = match_subject_name(subject, data)
+            if not subject_name:
+                subject_name = input("Please enter your session's subject: ")
+
+                subject_id = match_subject_name(subject_name, data).subject_id
                 if subject_id is None:
-                    subject = ""
+                    subject_name = ""
                     raise ValueError("Please enter a valid subject")
 
             if not start:
@@ -189,15 +191,39 @@ def session_manager(data):
         except ValueError as error:
             print(error)
 
-# @line_split
-# def update_subject(data):
-#     exit_now: bool = False
+@line_split
+def update_subject(data):
+    exit_now: bool = False
+    subject: Subject | None = None
+    name: str = ""
+    description: str = ""
+    goal: int = -1
+    difficulty: int = -1
 
 
-#     while not exit_now:
+    while not exit_now:
+        try:
+            if not name:
+                name = input("Please enter the name of the subject to change: ")
+                subject = match_subject_name(name, data)
+                if subject is None:
+                    name = ""
+                    raise ValueError(f"'{name}' not found")
+                else:
+                    print("For any data you may want to keep the same, leave it blank")
+                    name = input(f"Current name: {subject.name}\nNew name: ")
+                    subject.name = name
+            if not description and subject is not None:
+                description = input(f"Current description: '{subject.description}'\nNew description: ")
+        #         TODO from here
 
+
+
+
+        except ValueError as error:
+            print(error)
         
-#     return
+    return
 
 @line_split
 def welcome():
@@ -219,12 +245,12 @@ def load() -> dict:
         }
     return data
 
-def match_subject_name(name: str, data: dict) -> int:
+def match_subject_name(name: str, data: dict) -> Subject | None:
 
     for each in data["subjects"]:
         if each.name == name:
-            return each.subject_id
-    return -1
+            return each
+    return None
 
 if __name__ == '__main__':
     main()

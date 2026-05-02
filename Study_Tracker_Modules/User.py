@@ -11,7 +11,7 @@ class User:
             raise ValueError("Password cannot be empty")
         else:
             self.__user_id: int = user_id
-            self.__name: str = name
+            self.__name: str = name.lower()
             self.__password: str = password
 
     @property
