@@ -14,9 +14,9 @@ def main():
 
     welcome()
     if len(data["user"]) == 0:
-        data["user"] = login_loop()
+        login_loop(data)
     if len(data["subjects"]) == 0:
-        data["subjects"] = create_subjects()
+        new_subjects(data)
 
     main_loop(data)
 
@@ -33,27 +33,31 @@ def line_split(func):
     return wrapper
 
 @line_split
-def login_loop() -> User:
-    user = None
+def login_loop(data: dict) -> None:
+    user: User | None = None
+    name: str = ""
+    password: str = ""
 
     while user is None:
         try:
-            name = input("Please enter your name: ")
-            password = input("Please enter your password: ")
-            email = input("Please enter your email: ")
-            user_id = int(input("Please enter your user id: "))
-            user = User(user_id, name, email, password)
+            if not name:    
+                name = input("Please enter your name: ")
+                if not name:
+                    raise ValueError("Name must not be blank")
+            if not password:
+                password = input("Please enter your password: ")
+                if not password:
+                    raise ValueError("Password must not be blank")
+                user = User.login(name,password)
         except ValueError as error:
             print("Please enter a valid input, must fill all inputs & id must be a number" + " \n" + str(error))
     print("Logged in successfully")
 
-    return user
+    return
 
 @line_split
-def create_subjects() -> list[Subject]:
+def new_subjects(data: dict) -> None:
     exit_now = False
-    subjects = []
-    subject_id = -1
     name = ""
     description = ""
     goal = -1
@@ -61,15 +65,9 @@ def create_subjects() -> list[Subject]:
     error_counter = 0
 
     while not exit_now:
-        if len(subjects) == 0 and error_counter == 0:
+        if len(data["Subjects"]) == 0 and error_counter == 0:
             print("Looks like you have no subjects, lets add some!")
         try:
-            # TODO false error handing on ints
-            if subject_id == -1:
-                subject_id = int((input("Please enter your subject id: ")))
-                if type(subject_id) is not int:
-                    subject_id = -1
-                    raise ValueError("ID can only be an integer")
             if not name:
                 name = input("Please enter your subject's name: ")
                 if not name:
@@ -79,46 +77,35 @@ def create_subjects() -> list[Subject]:
                 if not description:
                     raise ValueError("Subject description cannot be empty")
             if goal == -1:
-                goal = int(input("Please enter your subject's weekly study goal in hours: "))
-                if type(goal) is not int:
+                try: 
+                    goal = int(input("Please enter your subject's weekly study goal in hours: "))
+                except ValueError:
                     goal = -1
-                    raise ValueError("Goal can only be an integer")
+                    raise ValueError("Goal must be a integer")
             if difficulty == -1:
-                difficulty = int(input("Please enter your subject's difficulty: "))
-                if type(difficulty) is not int:
+                try:
+                    difficulty = int(input("Please enter your subject's difficulty: "))
+                except:
                     difficulty = -1
                     raise ValueError("Difficulty can only be an integer")
-            try:
-                subjects.append(Subject(subject_id, name, description, goal, difficulty))
-            except ValueError as error:
-                print(str(error))
-                value = str(error).split(" ")[1]
-                match value:
-                    case "id":
-                        subject_id = -1
-                        break
-                    case "name":
-                        name = ""
-                        break
-                    case "description":
-                        description = ""
-                        break
-                    case "goal":
-                        goal = -1
-                        break
-                    case "difficulty":
-                        difficulty = -1
-                        break
 
         except ValueError as error:
             print(str(error))
             error_counter += 1
             continue
+        else:
+            if len(data["Subjects"]) == 0:    
+                data["Subjects"].append(Subject(1, name, description, goal, difficulty))
+            else:
+                highest: int = 1
+                for each in data["Subjects"]:
+                    if highest < each.subject_id:
+                        highest = each.subject_id
+                data["Subjects"].append(Subject(highest + 1, name, description, goal, difficulty))
 
         if input("Another?(Y/N): ").lower() == "n":
             exit_now = True
-    print(subjects[0])
-    return subjects
+
 @line_split
 def main_loop(data):
     exit_now = False
@@ -136,8 +123,11 @@ def main_loop(data):
                 continue
             case "see sessions":
                 continue
-            case "subject":
+            case "update subject":
+                update_subject(data)
                 continue
+            case "new subject":
+
             case "user":
                 continue
 
@@ -199,6 +189,16 @@ def session_manager(data):
         except ValueError as error:
             print(error)
 
+# @line_split
+# def update_subject(data):
+#     exit_now: bool = False
+
+
+#     while not exit_now:
+
+        
+#     return
+
 @line_split
 def welcome():
     print("Welcome to Study Tracker!")
@@ -219,12 +219,12 @@ def load() -> dict:
         }
     return data
 
-def match_subject_name(name: str, data: dict) -> None | int:
+def match_subject_name(name: str, data: dict) -> int:
 
     for each in data["subjects"]:
         if each.name == name:
             return each.subject_id
-    return None
+    return -1
 
 if __name__ == '__main__':
     main()

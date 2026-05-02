@@ -2,19 +2,16 @@ import hashlib
 
 
 class User:
-    def __init__(self, user_id: int, name: str, email: str, password: str):
+    def __init__(self, user_id: int, name: str, password: str):
         if user_id < 0:
             raise ValueError("User id cannot be negative")
         elif not name:
             raise ValueError("Name cannot be empty")
-        elif not email:
-            raise ValueError("Email cannot be empty")
         elif not password:
             raise ValueError("Password cannot be empty")
         else:
             self.__user_id: int = user_id
             self.__name: str = name
-            self.__email: str = email
             self.__password: str = password
 
     @property
@@ -38,17 +35,6 @@ class User:
             raise ValueError("Name cannot be empty")
         else:
             self.__name = value.lower()
-
-    @property
-    def email(self) -> str:
-        return self.__email
-
-    @email.setter
-    def email(self, value: str) -> None:
-        if not value:
-            raise ValueError("Email cannot be empty")
-        else:
-            self.__email = value.lower()
 
     @property
     def password(self) -> str:
@@ -75,4 +61,9 @@ class User:
     def password_hasher(password: str) -> str:
         password = hashlib.sha256(password.encode()).hexdigest()
         return password
+
+    @staticmethod
+    def login( name, password) -> User:
+
+        return User(1,name,password)
 
