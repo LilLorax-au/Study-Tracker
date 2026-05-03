@@ -1,3 +1,5 @@
+import time
+
 from Study_Tracker_Modules.Stopwatch import Stopwatch
 from Study_Tracker_Modules.User import User
 from Study_Tracker_Modules.Session import Session, STUDY_TYPES
@@ -13,18 +15,18 @@ def main():
     data = load()
 
     welcome()
-    if len(data["user"]) == 0:
-        login_loop(data)
+
+    login_loop(data)
+
     if len(data["subjects"]) == 0:
         new_subjects(data)
 
     main_loop(data)
 
-
-
     return
 
 def line_split(func):
+    """formatting decorator for outputs"""
     def wrapper(*args, **kwargs):
         print(LINE_SPLITTER)
         result = func(*args, **kwargs)
@@ -34,29 +36,70 @@ def line_split(func):
 
 @line_split
 def login_loop(data: dict) -> None:
+    """logs in a user or signs up if there are no users"""
     user: User | None = None
     name: str = ""
     password: str = ""
+    login_success: bool = False
+    password_counter: int = 4
+    shutdown_count: int = 3
 
-    while user is None:
-        try:
-            if not name:    
-                name = input("Please enter your name: ")
+    # call for if a user exists
+    if len(data["user"]) > 0:
+        while not login_success:
+            try:
                 if not name:
-                    raise ValueError("Name must not be blank")
-            if not password:
-                password = input("Please enter your password: ")
-                if not password:
-                    raise ValueError("Password must not be blank")
-                user = User.login(name,password)
-        except ValueError as error:
-            print("Please enter a valid input, must fill all inputs & id must be a number" + " \n" + str(error))
-    print("Logged in successfully")
+                    name = input("Please enter your name: ")
+                    # look for user, user list at the point of 03/05/2026 should only ever hold one user.
+                    for each in data["user"]:
+                        if name.lower() == each.name:
+                            user = each
+                            break
+                    if user is None:
+                        name = ""
+                        raise ValueError("Name not found")
+                if user is not None:
+                    password = input(f"Hello {user.name}, please enter your password: ")
+                    # check if passwords match
+                    if User.password_hasher(password) is not user.password:
+                        password_counter -= 1
+                        if password_counter == 0:
+                            while shutdown_count:
+                                print(f"Passwords do not match to many times: shutting down in {shutdown_count}")
+                                time.sleep(1)
+                                shutdown_count -= 1
+                            exit()
+                        else:
+                            raise ValueError(f"Password not matched, Tries remaining: {password_counter}")
+                    else:
+                        login_success = True
+            except ValueError as error:
+                print(str(error))
 
+    # call for if no user exists
+    else:
+        while user is None:
+            try:
+                if not name:
+                    name = input("Please enter your name: ")
+                    if not name:
+                        raise ValueError("Name must not be blank")
+                if not password:
+                    password = input("Please enter your password: ")
+                    if not password:
+                        raise ValueError("Password must not be blank")
+            except ValueError as error:
+                print("Please enter a valid input, must fill all inputs & id must be a number" + " \n" + str(error))
+            else:
+                user = User.sign_up(name, password)
+                data["user"].append(user)
+
+    print("Logged in successfully")
     return
 
 @line_split
 def new_subjects(data: dict) -> None:
+    """Create new subject, adds to data dict"""
     exit_now = False
     name = ""
     description = ""
@@ -108,8 +151,10 @@ def new_subjects(data: dict) -> None:
             continue
         else:
             if len(data["subjects"]) == 0:
+                # the first subject should have id of one
                 data["subjects"].append(Subject(1, name, description, goal, difficulty))
             else:
+                # finding the highest id stops any ids repeating
                 highest: int = 1
                 for each in data["subjects"]:
                     if highest < each.subject_id:
@@ -121,6 +166,7 @@ def new_subjects(data: dict) -> None:
 
 @line_split
 def main_loop(data):
+    """Main program loop"""
     exit_now = False
     while not exit_now:
         user_input = input(
@@ -144,8 +190,10 @@ def main_loop(data):
                 new_subjects(data)
                 continue
             case "user":
+                update_user(data)
                 continue
             case "exit":
+                exit_now = True
                 continue
             case _:
                 print(f"Invalid input: '{user_input}'\n ")
@@ -153,6 +201,7 @@ def main_loop(data):
 
 @line_split
 def session_manager(data):
+    """where sessions are made and ran"""
     exit_now = False
     session_type = ""
     subject_name = ""
@@ -195,9 +244,13 @@ def session_manager(data):
                                 subject_id,
                                 data["user"].user_id))
                     else:
+                        highest: int = 1
+                        for each in data["sessions"]:
+                            if highest < each.session_id:
+                                highest = each.session_id
                         data["sessions"].append(
                             Session(
-                                data["sessions"].session_id + 1,
+                                highest + 1,
                                 datetime.now(),
                                 study_time,
                                 session_type,
@@ -212,6 +265,7 @@ def session_manager(data):
 
 @line_split
 def update_subject(data):
+    """update a subject"""
     exit_now: bool = False
     subject: Subject | None = None
     name: str = ""
@@ -280,23 +334,50 @@ def update_subject(data):
             print(f"{subject.name}'s new state:\n" + str(subject))
             exit_now = True
 
-
     return
 
+@line_split
 def update_user(data):
+    """update a user"""
+    # README:: only ever one user at the point of 03/05/2026, if ever more users, refactor required
+
     exit_now: bool = False
     user: User = data["user"][0]
     name: str = ""
-    password: str = ""
+    password_counter: int = 3
+    password_changed: bool = False
+
 
     while not exit_now:
         try:
             if not name:
                 name = input(f"Current name: {user.name}\nNew name: ")
+                if name:
+                    user.name = name.lower()
+                else:
+                    raise ValueError("Name cannot be empty")
+            if not password_changed:
+                if password_counter != 0:
+                    if input("Do you want to change the password? (y/n): ").lower() == "n": break
+                    old_password = input(f"Enter your old password: ")
+                    new_password = input(f"Enter your new password: ")
+
+                    if user.change_password(new_password, old_password):
+                        print("\nPassword changed successfully")
+                        password_changed = True
+                    else:
+                        print(f"Old password must match and new password cannot be the same as the old, tries remaining: {password_counter}")
+            else:
+                exit_now = True
+        except ValueError as error:
+            print(error)
+
+
 
 
 @line_split
 def welcome():
+    """To print welcome message"""
     print("Welcome to Study Tracker!")
 
 # @line_split
@@ -307,6 +388,7 @@ def welcome():
 #     return success
 @line_split
 def load() -> dict:
+    """load data from file"""
     data = \
         {
             "user": [],
@@ -316,7 +398,7 @@ def load() -> dict:
     return data
 
 def match_subject_name(name: str, data: dict) -> Subject | None:
-
+    """match subject name to data"""
     for each in data["subjects"]:
         if each.name == name:
             return each
