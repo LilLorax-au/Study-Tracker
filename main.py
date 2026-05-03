@@ -4,7 +4,10 @@ from Study_Tracker_Modules.Stopwatch import Stopwatch
 from Study_Tracker_Modules.User import User
 from Study_Tracker_Modules.Session import Session, STUDY_TYPES
 from Study_Tracker_Modules.Subject import Subject
+from Study_Tracker_Modules.Database import StudyTrackerDB
 from datetime import datetime
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 
@@ -12,7 +15,9 @@ LINE_SPLITTER = "-"*30
 
 
 def main():
-    data = load()
+    db = StudyTrackerDB()
+
+    data = load(db)
 
     welcome()
 
@@ -21,7 +26,7 @@ def main():
     if len(data["subjects"]) == 0:
         new_subjects(data)
 
-    main_loop(data)
+    main_loop(data, db)
 
     return
 
@@ -33,6 +38,10 @@ def line_split(func):
         print(LINE_SPLITTER)
         return result
     return wrapper
+
+def welcome():
+    """To print welcome message"""
+    print("Welcome to Study Tracker!")
 
 @line_split
 def login_loop(data: dict) -> None:
@@ -163,9 +172,15 @@ def new_subjects(data: dict) -> None:
 
         if input("Another?(Y/N): ").lower() == "n":
             exit_now = True
+        else:
+            name = ""
+            description = ""
+            goal = -1
+            difficulty = -1
+            error_counter = 0
 
 @line_split
-def main_loop(data):
+def main_loop(data, db):
     """Main program loop"""
     exit_now = False
     while not exit_now:
@@ -182,6 +197,7 @@ def main_loop(data):
                 print("made it")
                 continue
             case "see sessions":
+                see_sessions(data)
                 continue
             case "update subject":
                 update_subject(data)
@@ -193,6 +209,8 @@ def main_loop(data):
                 update_user(data)
                 continue
             case "exit":
+                db.build_schema()
+                db.save_data(data)
                 exit_now = True
                 continue
             case _:
@@ -205,7 +223,7 @@ def session_manager(data):
     exit_now = False
     session_type = ""
     subject_name = ""
-    subject_id = 0
+    subject_id: int | None = 0
     start = ""
 
     timer = Stopwatch()
@@ -214,15 +232,16 @@ def session_manager(data):
         try:
             if not session_type:
                 session_type = input("Please enter your session type: ")
-                if session_type not in STUDY_TYPES:
+                if session_type.lower() not in STUDY_TYPES:
                     session_type = ""
                     raise ValueError("Please enter a valid session type")
 
             if not subject_name:
                 subject_name = input("Please enter your session's subject: ")
 
-                subject_id = match_subject_name(subject_name, data).subject_id
-                if subject_id is None:
+                if match_subject_name(subject_name, data) is not None:
+                    subject_id = match_subject_name(subject_name, data).subject_id
+                else:
                     subject_name = ""
                     raise ValueError("Please enter a valid subject")
 
@@ -232,17 +251,18 @@ def session_manager(data):
 
                     timer.start_time()
                     input("When you're finished, just press enter ")
-                    study_time = (timer.stop_time()/60)/60
+                    study_time = (timer.stop_time()/60)
 
                     if len(data["sessions"]) == 0:
                         data["sessions"].append(
                             Session(
                                 1,
+                                subject_name,
                                 datetime.now(),
                                 study_time,
                                 session_type,
                                 subject_id,
-                                data["user"].user_id))
+                                data["user"][0].user_id))
                     else:
                         highest: int = 1
                         for each in data["sessions"]:
@@ -251,18 +271,38 @@ def session_manager(data):
                         data["sessions"].append(
                             Session(
                                 highest + 1,
+                                subject_name,
                                 datetime.now(),
                                 study_time,
                                 session_type,
                                 subject_id,
-                                data["user"].user_id))
+                                data["user"][0].user_id))
                     exit_now = True
                 else:
                     start = ""
                     raise ValueError("Please only enter the work 'start'")
         except ValueError as error:
             print(error)
+@line_split
+def see_sessions(data):
+    """Shows data visuals for sessions: just text at this point, ran out of time to complete visuals"""
+    for each in data["sessions"]:
+        print(each)
 
+
+
+    # sessions: list = []
+    # for each in data["sessions"]:
+    #     sessions.append(
+    #         [int(each.session_id),
+    #          str(each.date),
+    #          float(each.session_time),
+    #          str(each.study_type)])
+    #
+    # df = pd.DataFrame(sessions, columns=["session_id", "date", "session_time", "study_type"])
+    #
+    # plt.plot(df)
+    # plt.show()
 @line_split
 def update_subject(data):
     """update a subject"""
@@ -372,13 +412,8 @@ def update_user(data):
         except ValueError as error:
             print(error)
 
-
-
-
 @line_split
-def welcome():
-    """To print welcome message"""
-    print("Welcome to Study Tracker!")
+
 
 # @line_split
 # def save(data: dict):
@@ -387,14 +422,11 @@ def welcome():
 #
 #     return success
 @line_split
-def load() -> dict:
+def load(db) -> dict:
     """load data from file"""
+    data = db.load_data()
     data = \
-        {
-            "user": [],
-            "subjects": [],
-            "sessions": []
-        }
+
     return data
 
 def match_subject_name(name: str, data: dict) -> Subject | None:

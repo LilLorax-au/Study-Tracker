@@ -3,7 +3,7 @@ from datetime import datetime
 STUDY_TYPES: list = ["reading","reviewing","watching","project work","coding","research"]
 
 class Session:
-    def __init__(self, session_id: int, date: datetime, session_time: float, study_type: str, subject_id: int, user_id: int):
+    def __init__(self, session_id: int, subject_name: str, date: datetime, session_time: float, study_type: str, subject_id: int, user_id: int):
         if session_id < 0:
             raise Exception('Session id cannot be negative')
         # TODO fix this, needs to be date
@@ -22,6 +22,7 @@ class Session:
             self.__date = date.date()
             self.__session_time = session_time
             self.__study_type = study_type.lower()
+            self.__subject_name = subject_name
             self.__subject_id = subject_id
             self.__user_id = user_id
 
@@ -35,6 +36,17 @@ class Session:
             raise Exception('Session id cannot be negative')
         else:
             self.__session_id = value
+
+    @property
+    def subject_name(self) -> str:
+        return self.__subject_name
+
+    @subject_name.setter
+    def subject_name(self, value: str) -> None:
+        if value:
+            self.__subject_name = value
+        else:
+            raise Exception('Subject name cannot be empty')
 
     # TODO need to assign date properly
     @property
@@ -96,11 +108,14 @@ class Session:
         obj_state: str = ""
 
         obj_state = f"Session ID: {self.session_id}\n"
+        obj_state += f"Subject Name: {self.subject_name}\n"
         obj_state += f"Date: {self.date}\n"
-        obj_state += f"Session Time: {self.session_time}\n"
+        obj_state += f"Session Time: {self.session_time:.2f}\n"
         obj_state += f"Study Type: {self.study_type}\n"
         obj_state += f"Subject ID: {self.subject_id}\n"
         obj_state += f"User ID: {self.user_id}"
+
+        return obj_state
 
 
 
