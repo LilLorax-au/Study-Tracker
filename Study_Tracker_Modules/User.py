@@ -67,3 +67,11 @@ class User:
 
         return User(1,name,password)
 
+    def __str__(self):
+        obj_state: str = ""
+
+        obj_state = f"User ID: {self.user_id}\n"
+        obj_state += f"Name: {self.name}\n"
+        obj_state += f"Password: {self.password}\n"
+
+        return obj_state

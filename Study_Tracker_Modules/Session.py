@@ -92,6 +92,16 @@ class Session:
         else:
             self.__user_id = value
 
+    def __str__(self):
+        obj_state: str = ""
+
+        obj_state = f"Session ID: {self.session_id}"
+        obj_state += f"Date: {self.date}"
+        obj_state += f"Session Time: {self.session_time}"
+        obj_state += f"Study Type: {self.study_type}"
+        obj_state += f"Subject ID: {self.subject_id}"
+        obj_state += f"User ID: {self.user_id}"
+
 
 
 

@@ -83,3 +83,13 @@ class Subject:
             raise ValueError("Difficulty cannot be greater than 10")
         else:
             self.__difficulty = difficulty
+
+    def __str__(self) -> str:
+        obj_state: str = ""
+        obj_state = f"Subject ID: {self.subject_id}\n"
+        obj_state += f"Subject Name: {self.name}\n"
+        obj_state += f"Subject Description: {self.description}\n"
+        obj_state += f"Subject Weekly Goal: {self.goal}\n"
+        obj_state += f"Subject Difficulty: {self.difficulty}"
+
+        return obj_state
