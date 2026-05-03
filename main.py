@@ -65,7 +65,7 @@ def new_subjects(data: dict) -> None:
     error_counter = 0
 
     while not exit_now:
-        if len(data["Subjects"]) == 0 and error_counter == 0:
+        if len(data["subjects"]) == 0 and error_counter == 0:
             print("Looks like you have no subjects, lets add some!")
         try:
             if not name:
@@ -79,29 +79,42 @@ def new_subjects(data: dict) -> None:
             if goal == -1:
                 try: 
                     goal = int(input("Please enter your subject's weekly study goal in hours: "))
-                except ValueError:
+                except ValueError as error:
+                    error.args = ("Goal must be a integer",)
                     goal = -1
-                    raise ValueError("Goal must be a integer")
+                    raise error
+                else:
+                    if goal < 0:
+                        goal = -1
+                        raise ValueError("Goal must be higher then 0")
+                    elif goal > 84:
+                        goal = -1
+                        raise ValueError(f"That's unhealthy, make a more reasonable goal")
             if difficulty == -1:
                 try:
                     difficulty = int(input("Please enter your subject's difficulty: "))
-                except:
+                except ValueError as error:
+                    error.args=  ("Difficulty can only be an integer",)
                     difficulty = -1
-                    raise ValueError("Difficulty can only be an integer")
+                    raise error
+                else:
+                    if difficulty < 0 or difficulty > 10:
+                        difficulty = -1
+                        raise ValueError("Difficulty can only be between 0 and 10")
 
         except ValueError as error:
             print(str(error))
             error_counter += 1
             continue
         else:
-            if len(data["Subjects"]) == 0:    
-                data["Subjects"].append(Subject(1, name, description, goal, difficulty))
+            if len(data["subjects"]) == 0:
+                data["subjects"].append(Subject(1, name, description, goal, difficulty))
             else:
                 highest: int = 1
-                for each in data["Subjects"]:
+                for each in data["subjects"]:
                     if highest < each.subject_id:
                         highest = each.subject_id
-                data["Subjects"].append(Subject(highest + 1, name, description, goal, difficulty))
+                data["subjects"].append(Subject(highest + 1, name, description, goal, difficulty))
 
         if input("Another?(Y/N): ").lower() == "n":
             exit_now = True
@@ -113,9 +126,10 @@ def main_loop(data):
         user_input = input(
             "What would you like to do?\n"
             "start new session(Type: session)\n"
-            "to see session data(Type: see sessions)"
-            "to manage subjects(Type: subject)\n"    
-            "to manage user account(Type: user)\n")
+            "to see session data(Type: see sessions)\n"
+            "to manage subjects(Type: update subject)\n"    
+            "to manage user account(Type: user)\n"
+            "to save and exit(Type: exit)\n")
         match user_input.lower():
             case "session":
                 session_manager(data)
@@ -127,9 +141,14 @@ def main_loop(data):
                 update_subject(data)
                 continue
             case "new subject":
-
+                new_subjects(data)
                 continue
             case "user":
+                continue
+            case "exit":
+                continue
+            case _:
+                print(f"Invalid input: '{user_input}'\n ")
                 continue
 
 @line_split
@@ -210,8 +229,7 @@ def update_subject(data):
                     name = ""
                     raise ValueError(f"'{name}' not found")
                 else:
-                    print("For any data you may want to keep the same, leave it blank")
-                    name = input(f"Current name: {subject.name}\nNew name: ")
+                    name = input(f"Current name: '{subject.name}'\nNew name: ")
                     subject.name = name
 
             if not description and subject is not None:
@@ -219,7 +237,7 @@ def update_subject(data):
                 if description:
                     subject.description = description
                 else:
-                    # done to create redunancy, stops relooping if a input fails elsewhere
+                    # done to create redundancy, stops relooping if an input fails elsewhere
                     description = subject.description
 
             if goal is -1 and subject is not None:
@@ -230,26 +248,27 @@ def update_subject(data):
                     goal = -1
                     raise error
                 else:
-                    # other errors will be handled by class propertys
+                    # other errors will be handled by class property's
                     subject.goal = goal
             
             if difficulty is -1 and subject is not None:
                 try:
                     difficulty = int(input(f"Current difficulty: {subject.difficulty}\nNew difficulty: "))
                 except ValueError as error:
-                    error.args = ("Diffculty must be a integer",)
+                    error.args = ("Difficulty must be a integer",)
                     difficulty = -1
+                    raise error
                 else:
                     subject.difficulty = difficulty
-                    # TODO from here
-                
-
-
 
 
         except ValueError as error:
             print(error)
-        
+        else:
+            print(f"{subject.name}'s new state:\n" + str(subject))
+            exit_now = True
+
+
     return
 
 @line_split
