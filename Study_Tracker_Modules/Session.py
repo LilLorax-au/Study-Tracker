@@ -10,13 +10,13 @@ class Session:
         # elif date != type(datetime):
         #     raise Exception('Date must be of type datetime')
         elif session_time < 0:
-            raise Exception('Session time cannot be negative')
+            raise ValueError('Session time cannot be negative')
         elif study_type.lower() not in STUDY_TYPES:
-            raise Exception('Study type must be one of ' + ', '.join(STUDY_TYPES))
+            raise ValueError('Study type must be one of ' + ', '.join(STUDY_TYPES))
         elif subject_id < 0:
-            raise Exception('Subject id cannot be negative')
+            raise ValueError('Subject id cannot be negative')
         elif user_id < 0:
-            raise Exception('User id cannot be negative')
+            raise ValueError('User id cannot be negative')
         else:
             self.__session_id = session_id
             self.__date = date.date()
@@ -33,7 +33,7 @@ class Session:
     @session_id.setter
     def session_id(self, value: int) -> None:
         if value < 0:
-            raise Exception('Session id cannot be negative')
+            raise ValueError('Session id cannot be negative')
         else:
             self.__session_id = value
 
@@ -46,7 +46,7 @@ class Session:
         if value:
             self.__subject_name = value
         else:
-            raise Exception('Subject name cannot be empty')
+            raise ValueError('Subject name cannot be empty')
 
     # TODO need to assign date properly
     @property
@@ -56,7 +56,7 @@ class Session:
     @date.setter
     def date(self, value: datetime) -> None:
         if type(value) != datetime:
-            raise Exception('Date must be of type datetime')
+            raise ValueError('Date must be of type datetime')
         else:
             self.__date = value
 
@@ -67,7 +67,7 @@ class Session:
     @session_time.setter
     def session_time(self, value: float) -> None:
         if value < 0:
-            raise Exception('Session time cannot be negative')
+            raise ValueError('Session time cannot be negative')
         else:
             self.__session_time = value
 
@@ -78,7 +78,7 @@ class Session:
     @study_type.setter
     def study_type(self, value: str) -> None:
         if value not in STUDY_TYPES:
-            raise Exception('Study type must be one of ' + ', '.join(STUDY_TYPES))
+            raise ValueError('Study type must be one of ' + ', '.join(STUDY_TYPES))
         else:
             self.__study_type = value
 
@@ -89,7 +89,7 @@ class Session:
     @subject_id.setter
     def subject_id(self, value: int) -> None:
         if value < 0:
-            raise Exception('Subject id cannot be negative')
+            raise ValueError('Subject id cannot be negative')
         else:
             self.__subject_id = value
 
@@ -100,7 +100,7 @@ class Session:
     @user_id.setter
     def user_id(self, value: int) -> None:
         if value < 0:
-            raise Exception('User id cannot be negative')
+            raise ValueError('User id cannot be negative')
         else:
             self.__user_id = value
 
