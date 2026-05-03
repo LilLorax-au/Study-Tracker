@@ -72,6 +72,6 @@ class User:
 
         obj_state = f"User ID: {self.user_id}\n"
         obj_state += f"Name: {self.name}\n"
-        obj_state += f"Password: {self.password}\n"
+        obj_state += f"Password: {self.password}"
 
         return obj_state
