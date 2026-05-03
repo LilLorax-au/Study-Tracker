@@ -59,11 +59,11 @@ class Subject:
             self.__description = description
 
     @property
-    def weekly_recommended_hours(self) -> int:
+    def goal(self) -> int:
         return self.__weekly_goal_hours
 
-    @weekly_recommended_hours.setter
-    def weekly_recommended_hours(self, weekly_goal_hours: int) -> None:
+    @goal.setter
+    def goal(self, weekly_goal_hours: int) -> None:
         if weekly_goal_hours < 0:
             raise ValueError("Weekly recommended hours cannot be negative")
         elif weekly_goal_hours > (24 * 7):

@@ -34,16 +34,16 @@ class TestSubject(unittest.TestCase):
             self.subject.description = ""
 
     def test_subject_getters_setters_weekly_recommended_hours_in_range(self):
-        self.subject.weekly_recommended_hours = 10
-        self.assertEqual(self.subject.weekly_recommended_hours, 10)
+        self.subject.goal = 10
+        self.assertEqual(self.subject.goal, 10)
 
     def test_subject_getters_setters_weekly_recommended_hours_out_lower_range(self):
         with self.assertRaises(ValueError):
-            self.subject.weekly_recommended_hours = -1
+            self.subject.goal = -1
 
     def test_subject_getters_setters_weekly_recommended_hours_out_upper_range(self):
         with self.assertRaises(ValueError):
-            self.subject.weekly_recommended_hours = 500
+            self.subject.goal = 500
 
     def test_subject_getters_setters_difficulty_in_range(self):
         self.subject.difficulty = 6

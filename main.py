@@ -213,9 +213,36 @@ def update_subject(data):
                     print("For any data you may want to keep the same, leave it blank")
                     name = input(f"Current name: {subject.name}\nNew name: ")
                     subject.name = name
+
             if not description and subject is not None:
                 description = input(f"Current description: '{subject.description}'\nNew description: ")
-        #         TODO from here
+                if description:
+                    subject.description = description
+                else:
+                    # done to create redunancy, stops relooping if a input fails elsewhere
+                    description = subject.description
+
+            if goal is -1 and subject is not None:
+                try:
+                    goal = int(input(f"Current goal: {subject.goal}\nNew goal: "))
+                except ValueError as error:
+                    error.args = ("Goal must be a integer",)
+                    goal = -1
+                    raise error
+                else:
+                    # other errors will be handled by class propertys
+                    subject.goal = goal
+            
+            if difficulty is -1 and subject is not None:
+                try:
+                    difficulty = int(input(f"Current difficulty: {subject.difficulty}\nNew difficulty: "))
+                except ValueError as error:
+                    error.args = ("Diffculty must be a integer",)
+                    difficulty = -1
+                else:
+                    subject.difficulty = difficulty
+                    # TODO from here
+                
 
 
 
