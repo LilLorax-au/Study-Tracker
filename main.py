@@ -1,32 +1,30 @@
 import time
-
 from Study_Tracker_Modules.Stopwatch import Stopwatch
 from Study_Tracker_Modules.User import User
 from Study_Tracker_Modules.Session import Session, STUDY_TYPES
 from Study_Tracker_Modules.Subject import Subject
 from Study_Tracker_Modules.Database import StudyTrackerDB
 from datetime import datetime
-import matplotlib.pyplot as plt
-import pandas as pd
-
-
 
 LINE_SPLITTER = "-"*30
 
-
 def main():
     db = StudyTrackerDB()
-
     data = load(db)
 
     welcome()
 
     login_loop(data)
 
+
     if len(data["subjects"]) == 0:
         new_subjects(data)
 
     main_loop(data, db)
+
+    bye_bye()
+
+
 
     return
 
@@ -70,7 +68,7 @@ def login_loop(data: dict) -> None:
                 if user is not None:
                     password = input(f"Hello {user.name}, please enter your password: ")
                     # check if passwords match
-                    if User.password_hasher(password) is not user.password:
+                    if User.password_hasher(password) != user.password:
                         password_counter -= 1
                         if password_counter == 0:
                             while shutdown_count:
@@ -209,7 +207,6 @@ def main_loop(data, db):
                 update_user(data)
                 continue
             case "exit":
-                db.build_schema()
                 db.save_data(data)
                 exit_now = True
                 continue
@@ -234,7 +231,7 @@ def session_manager(data):
                 session_type = input("Please enter your session type: ")
                 if session_type.lower() not in STUDY_TYPES:
                     session_type = ""
-                    raise ValueError("Please enter a valid session type")
+                    raise ValueError("Please enter a valid session type: " + ', '.join(STUDY_TYPES))
 
             if not subject_name:
                 subject_name = input("Please enter your session's subject: ")
@@ -264,7 +261,7 @@ def session_manager(data):
                                 subject_id,
                                 data["user"][0].user_id))
                     else:
-                        highest: int = 1
+                        highest: int = 0
                         for each in data["sessions"]:
                             if highest < each.session_id:
                                 highest = each.session_id
@@ -425,7 +422,6 @@ def update_user(data):
 def load(db) -> dict:
     """load data from file"""
     data = db.load_data()
-    data = \
 
     return data
 
@@ -435,6 +431,10 @@ def match_subject_name(name: str, data: dict) -> Subject | None:
         if each.name == name:
             return each
     return None
+
+@line_split
+def bye_bye():
+    print("Thank you for using this application<3")
 
 if __name__ == '__main__':
     main()

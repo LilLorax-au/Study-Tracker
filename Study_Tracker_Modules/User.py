@@ -12,7 +12,7 @@ class User:
         else:
             self.__user_id: int = user_id
             self.__name: str = name.lower()
-            self.__password: str = self.password_hasher(password)
+            self.__password: str = password
 
     @property
     def user_id(self) -> int:
@@ -65,7 +65,7 @@ class User:
     @staticmethod
     def sign_up(name, password) -> User:
 
-        return User(1,name,password)
+        return User(1,name,User.password_hasher(password))
 
     def __str__(self):
         obj_state: str = ""
