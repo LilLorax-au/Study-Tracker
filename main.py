@@ -230,15 +230,17 @@ def update_subject(data):
                     raise ValueError(f"'{name}' not found")
                 else:
                     name = input(f"Current name: '{subject.name}'\nNew name: ")
-                    subject.name = name
+                    if name:
+                        subject.name = name.lower()
+                    else:
+                        raise ValueError("Name cannot be empty")
 
             if not description and subject is not None:
                 description = input(f"Current description: '{subject.description}'\nNew description: ")
                 if description:
                     subject.description = description
                 else:
-                    # done to create redundancy, stops relooping if an input fails elsewhere
-                    description = subject.description
+                    raise ValueError("Description cannot be empty")
 
             if goal is -1 and subject is not None:
                 try:
@@ -248,9 +250,15 @@ def update_subject(data):
                     goal = -1
                     raise error
                 else:
-                    # other errors will be handled by class property's
-                    subject.goal = goal
-            
+                    if goal < 0:
+                        goal = -1
+                        raise ValueError("Goal must be higher then 0")
+                    elif goal > 84:
+                        goal = -1
+                        raise ValueError(f"That's unhealthy, make a more reasonable goal")
+                    else:
+                        subject.goal = goal
+
             if difficulty is -1 and subject is not None:
                 try:
                     difficulty = int(input(f"Current difficulty: {subject.difficulty}\nNew difficulty: "))
@@ -259,7 +267,11 @@ def update_subject(data):
                     difficulty = -1
                     raise error
                 else:
-                    subject.difficulty = difficulty
+                    if difficulty < 0 or difficulty > 10:
+                        difficulty = -1
+                        raise ValueError("Difficulty can only be between 0 and 10")
+                    else:
+                        subject.difficulty = difficulty
 
 
         except ValueError as error:
@@ -270,6 +282,18 @@ def update_subject(data):
 
 
     return
+
+def update_user(data):
+    exit_now: bool = False
+    user: User = data["user"][0]
+    name: str = ""
+    password: str = ""
+
+    while not exit_now:
+        try:
+            if not name:
+                name = input(f"Current name: {user.name}\nNew name: ")
+
 
 @line_split
 def welcome():
